@@ -1,0 +1,105 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarBackgroundColor":"#FF0000",
+				"navigationBarTextStyle":"white"
+			}
+		}
+        ,{
+            "path" : "pages/user/user",
+            "style" : {
+				"navigationBarTitleText": "个人中心"
+			}
+        }
+        ,{
+            "path" : "pages/goods/goods",
+            "style" : {
+				"navigationBarTitleText":"商品信息"
+			}
+        }
+        ,{
+            "path" : "pages/order/order",
+            "style" : {
+				"navigationBarTitleText":"订单信息"
+			}
+        }
+        ,{
+            "path" : "pages/goodAdd/goodAdd",
+            "style" : {
+				"navigationBarTitleText":"新增商品"
+			}
+        }
+        ,{
+            "path" : "pages/goodUp/goodUp",
+            "style" : {
+				"navigationBarTitleText":"商品列表"
+			}
+        }
+        ,{
+            "path" : "pages/orderDetail/orderDetail",
+            "style" : {
+				"navigationBarTitleText":"订单明细"
+			}
+        }
+        ,{
+            "path" : "pages/goodsSecond/goodsSecond",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/goodsList/goodsList",
+            "style" : {
+				"disableScroll":true
+			}
+        }
+        ,{
+            "path" : "pages/test2/test2",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/searchList/searchList",
+            "style" : {
+				"navigationBarTitleText":"搜索"
+			}
+        }
+    ],
+	"tabBar": {
+		"color":"#999999",
+		"borderStyle":"black",
+		"backgroundColor":"white",
+		"selectedColor":"#FF0000",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "static/tabbar/sy_01.png",
+				"selectedIconPath": "static/tabbar/sy_02.png"
+			},
+			{
+				"pagePath": "pages/user/user",
+				"text": "个人中心",
+				"iconPath": "static/tabbar/wd_01.png",
+				"selectedIconPath": "static/tabbar/wd_02.png"
+			}
+		]
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "TT易选商城",
+		"navigationBarBackgroundColor": "#FFFFFF"
+	},
+	"condition":{
+		"current":0,
+		"list":[{
+			"name":"新增商品",
+			"path":"pages/goodAdd/goodAdd"
+		},{
+			"name":"图片裁剪2",
+			"path":"pages/test2/test2"
+		},{
+			"name":"商品列表",
+			"path":"pages/goodsList/goodsList"
+		}]
+	}
+}
