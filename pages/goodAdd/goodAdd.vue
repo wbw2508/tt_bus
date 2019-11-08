@@ -64,15 +64,21 @@
 			</view>
 			<button form-type="submit">提交</button>
 			<!-- <button form-type="reset">Reset</button> -->
+			<view style="position: fixed;top:0;left: 0;">
+				<image-cropper crop-fixed="true" crop-width="200" cropHeight="200" :src="tempFilePath" @confirm="confirm" @cancel="cancel"></image-cropper>
+			</view>
 		</form>
 	</view>
 </template>
 
 <script>
 	import avatar from '../../components/yq-avatar/yq-avatar.vue'
+	import ImageCropper from "@/components/invinbg-image-cropper/invinbg-image-cropper.vue"
+	
 	export default {
 		components:{
-			avatar
+			avatar,
+			ImageCropper
 		},
 		data() {
 			return {
@@ -115,9 +121,17 @@
 					sizeType:['compressed'],
 					success:res => {
 						console.log(res.tempFilePaths.shift())
-						this.tempFirstImg = res.tempFilePaths.shift()
+						this.tempFilePath = res.tempFilePaths.shift()
 					}
 				})
+			},
+			confirm(e) {
+				console.log(e)
+			    this.tempFilePath = ''
+			    this.cropFilePath = e.detail.tempFilePath
+			},
+			cancel() {
+			    console.log('canceled')
 			},
 			//  myUpload(rsp) {
 			// 	this.cropFirstImg = rsp.path; //更新头像方式一

@@ -63,6 +63,10 @@
 				"navigationBarTitleText":"搜索"
 			}
         }
+        ,{
+            "path" : "pages/test/test",
+            "style" : {}
+        }
     ],
 	"tabBar": {
 		"color":"#999999",
@@ -94,6 +98,9 @@
 		"list":[{
 			"name":"新增商品",
 			"path":"pages/goodAdd/goodAdd"
+		},{
+			"name":"图片裁剪1",
+			"path":"pages/test/test"
 		},{
 			"name":"图片裁剪2",
 			"path":"pages/test2/test2"
