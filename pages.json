@@ -32,12 +32,6 @@
 			}
         }
         ,{
-            "path" : "pages/goodUp/goodUp",
-            "style" : {
-				"navigationBarTitleText":"商品列表"
-			}
-        }
-        ,{
             "path" : "pages/orderDetail/orderDetail",
             "style" : {
 				"navigationBarTitleText":"订单明细"
@@ -50,6 +44,7 @@
         ,{
             "path" : "pages/goodsList/goodsList",
             "style" : {
+				"navigationBarTitleText":"商品列表",
 				"disableScroll":true
 			}
         }
@@ -65,6 +60,14 @@
         }
         ,{
             "path" : "pages/test/test",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/goodPutaway/goodPutaway",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/test3/test3",
             "style" : {}
         }
     ],
@@ -104,6 +107,9 @@
 		},{
 			"name":"图片裁剪2",
 			"path":"pages/test2/test2"
+		},{
+			"name":"图片裁剪3",
+			"path":"pages/test3/test3"
 		},{
 			"name":"商品列表",
 			"path":"pages/goodsList/goodsList"

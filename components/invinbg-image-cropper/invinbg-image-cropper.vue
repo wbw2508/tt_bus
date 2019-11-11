@@ -7,13 +7,13 @@
 					'transform': 'scale(' + scale + ',' + scale + ') ' + 'translate3d('+ x / scale + 'px,' + y / scale + 'px,' + '0)'
 					+ 'rotateZ('+ rotate * 90 +'deg)'
 					}">
-                <image :src="src" alt="cropper-img" ref="cropperImg" mode="scaleToFill" class="uni-image"></image>
+                <image v-if="src" :src="src" alt="cropper-img" ref="cropperImg" mode="scaleToFill" class="uni-image"></image>
             </view>
         </view>
         <view class="cropper-drag-box cropper-modal cropper-move pointer-events"></view>
         <view class="cropper-crop-box" :class="{'pointer-events': cropFixed}" :style="{'width': cropW + 'px','height': cropH + 'px','transform': 'translate3d('+ cropOffsertX + 'px,' + cropOffsertY + 'px,' + '0)'}">
             <view class="cropper-view-box">
-                <image :style="{'width': imageWidth + 'px','height': imageHeight + 'px','transform': 'scale(' + scale + ',' + scale + ') ' + 'translate3d('+ (x - cropOffsertX) / scale  + 'px,' + (y - cropOffsertY) / scale + 'px,' + '0)' + 'rotateZ('+ rotate * 90 +'deg)'}" mode="scaleToFill" :src="src" alt="cropper-img"></image>
+                <image v-if="src" :style="{'width': imageWidth + 'px','height': imageHeight + 'px','transform': 'scale(' + scale + ',' + scale + ') ' + 'translate3d('+ (x - cropOffsertX) / scale  + 'px,' + (y - cropOffsertY) / scale + 'px,' + '0)' + 'rotateZ('+ rotate * 90 +'deg)'}" mode="scaleToFill" :src="src" alt="cropper-img"></image>
             </view>
 
             <view v-if="!cropFixed" class="cropper-face cropper-move" @touchstart.stop.prevent="touchStart" @touchmove.stop.prevent="cropMoveing"></view>

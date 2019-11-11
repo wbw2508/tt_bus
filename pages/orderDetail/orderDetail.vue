@@ -7,7 +7,7 @@
 			<view class="searchInput">
 				<image class="searchIcon" src="../../static/icon_ck.png" mode=""></image>
 				<input type="text" :value="searchVal" @input="changeVal" placeholder="根据会员名查询" />
-				<image class="cancelIcon" @click="clearVal" src="../../static/btn_qx.png" mode=""></image>
+				<image v-if="searchVal" class="cancelIcon" @click="clearVal" src="../../static/btn_qx.png" mode=""></image>
 			</view>
 			<view class="searchBtn" @click="search">搜索</view>
 		</view>

@@ -14,7 +14,7 @@
 				<view v-if="toggleShow" class="secondMask">
 					<view class="mask" @click="toggle"></view>
 					<view class="twoCat">
-						<view v-for="(item,index) in twoCatList" class="item" :class="{active:twoCat == item}" @click="changeTwoCat(item)">{{item}}</view>
+						<view v-for="(item,index) in twoCatList" :key="index" class="item" :class="{active:twoCat == item}" @click="changeTwoCat(item)">{{item}}</view>
 					</view>
 				</view>
 				<view class="toggleShow" :class="{rotate:toggleShow}" @click="toggle">
@@ -22,28 +22,11 @@
 				</view>
 				<view class="secondCat">
 					<scroll-view class="twoCat" scroll-x="true">
-						<view v-for="(item,index) in twoCatList" class="item" :class="{active:twoCat == item}" @click="changeTwoCat(item)">{{item}}</view>
+						<view v-for="(item,index) in twoCatList" :key="index" class="item" :class="{active:twoCat == item}" @click="changeTwoCat(item)">{{item}}</view>
 					</scroll-view>
 				</view>
 				<scroll-view class="goodsArea" scroll-y="true">
-					<view v-for="(item,index) in goodsList" :key="index" class="good">
-						<image :src="item.img" mode=""></image>
-						<view class="goodDetail">
-							<view class="name">{{item.name}}</view>
-							<view class="price">
-								<view class="active" style="color: red;margin-right: 10upx;"><text>￥</text><text style="font-size:26upx;font-weight: bold;">{{item.originalPrice}}</text></view>
-								<view class="origin" style="color: #999;text-decoration:line-through">￥{{item.activePrice}}</view>
-							</view>
-							<view class="remainNum">
-								<view class="text">剩余库存：</view>
-								<view class="num">{{item.remainNum}}</view>
-							</view>
-							<view class="handleBtn">
-								<view class="isPutaway">上架</view> 
-								<view class="change">编辑</view>
-							</view>
-						</view>
-					</view>
+					<good v-for="(item,index) in goodsList" :key="index" :good="item"></good>
 				</scroll-view>
 			</view>
 		</view>
@@ -51,7 +34,12 @@
 </template>
 
 <script>
+	import good from '../../components/good.vue'
+	
 	export default {
+		components:{
+			good
+		},
 		data() {
 			return {
 				title:'',
@@ -62,63 +50,63 @@
 				twoCat:'全部',
 				goodsList:[
 					{
-						img:'../../static/temp/prod.png',
+						img:'../static/temp/prod.png',
+						name:'老伯海鸭蛋4个/份',
+						originalPrice:9.9,
+						activePrice:14.9,
+						remainNum:10000
+					},
+					{
+						img:'../static/temp/prod.png',
 						name:'海蛋海老蛋海老伯蛋海老伯海鸭蛋海老伯海鸭蛋海蛋伯海鸭蛋海老伯海鸭蛋4个/份',
 						originalPrice:9.9,
 						activePrice:14.9,
 						remainNum:10000
 					},
 					{
-						img:'../../static/temp/prod.png',
+						img:'../static/temp/prod.png',
 						name:'海蛋海老蛋海老伯蛋海老伯海鸭蛋海老伯海鸭蛋海蛋伯海鸭蛋海老伯海鸭蛋4个/份',
 						originalPrice:9.9,
 						activePrice:14.9,
 						remainNum:10000
 					},
 					{
-						img:'../../static/temp/prod.png',
+						img:'../static/temp/prod.png',
 						name:'海蛋海老蛋海老伯蛋海老伯海鸭蛋海老伯海鸭蛋海蛋伯海鸭蛋海老伯海鸭蛋4个/份',
 						originalPrice:9.9,
 						activePrice:14.9,
 						remainNum:10000
 					},
 					{
-						img:'../../static/temp/prod.png',
+						img:'../static/temp/prod.png',
 						name:'海蛋海老蛋海老伯蛋海老伯海鸭蛋海老伯海鸭蛋海蛋伯海鸭蛋海老伯海鸭蛋4个/份',
 						originalPrice:9.9,
 						activePrice:14.9,
 						remainNum:10000
 					},
 					{
-						img:'../../static/temp/prod.png',
+						img:'../static/temp/prod.png',
 						name:'海蛋海老蛋海老伯蛋海老伯海鸭蛋海老伯海鸭蛋海蛋伯海鸭蛋海老伯海鸭蛋4个/份',
 						originalPrice:9.9,
 						activePrice:14.9,
 						remainNum:10000
 					},
 					{
-						img:'../../static/temp/prod.png',
+						img:'../static/temp/prod.png',
 						name:'海蛋海老蛋海老伯蛋海老伯海鸭蛋海老伯海鸭蛋海蛋伯海鸭蛋海老伯海鸭蛋4个/份',
 						originalPrice:9.9,
 						activePrice:14.9,
 						remainNum:10000
 					},
 					{
-						img:'../../static/temp/prod.png',
+						img:'../static/temp/prod.png',
 						name:'海蛋海老蛋海老伯蛋海老伯海鸭蛋海老伯海鸭蛋海蛋伯海鸭蛋海老伯海鸭蛋4个/份',
 						originalPrice:9.9,
 						activePrice:14.9,
 						remainNum:10000
 					},
 					{
-						img:'../../static/temp/prod.png',
-						name:'海蛋海老蛋海老伯蛋海老伯海鸭蛋海老伯海鸭蛋海蛋伯海鸭蛋海老伯海鸭蛋4个/份',
-						originalPrice:9.9,
-						activePrice:14.9,
-						remainNum:10000
-					},
-					{
-						img:'../../static/temp/prod.png',
+						img:'../static/temp/prod.png',
 						name:'海蛋海老蛋海老伯蛋海老伯海鸭蛋海老伯海鸭蛋海蛋伯海鸭蛋海老伯海鸭蛋4个/份',
 						originalPrice:9.9,
 						activePrice:14.9,

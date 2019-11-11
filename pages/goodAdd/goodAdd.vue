@@ -4,7 +4,7 @@
 			<view class="line type">
 				<label for="type">上架类型</label>
 				<picker class="content" mode="selector" :range="type" @change="changeType" :value="typeIndex">
-					<view class="typePicker">当前选择的是{{type[typeIndex]}}</view>
+					<view class="typePicker">{{type[typeIndex]}}</view>
 				</picker>
 			</view>
 			<view v-if="isSeckill" class="line limitNum">
@@ -18,7 +18,7 @@
 			<view class="line category">
 				<label for="category">商品类目</label>
 				<picker class="content" mode="multiSelector" :range="category" :value="categoryIndex" @columnchange="chooseCategory" @change="changeCategory">
-					<view>当前选择的是{{category[0][categoryIndex[0]]}},{{category[1][categoryIndex[1]]}}</view>
+					<view>{{category[0][categoryIndex[0]]}},{{category[1][categoryIndex[1]]}}</view>
 				</picker>
 			</view>
 			<view class="line name">
@@ -45,7 +45,11 @@
 				<label for="">首图</label>
 				<view class="content">
 					<view style="position: relative;display: inline-block;">
-						<image @click="chooseFirstImg" :src="cropFirstImg =='' ? '../../static/photo.jpg' : cropFirstImg" mode=""></image>
+						<avatar
+							selWidth="200px" selHeight="400upx" @upload="myUpload" :avatarSrc="url"
+							avatarStyle="width: 200upx; height: 200upx;">
+						</avatar>
+						<!-- <image @click="chooseFirstImg" :src="cropFirstImg =='' ? '../../static/photo.jpg' : cropFirstImg" mode=""></image> -->
 						<image v-if="cropFirstImg" style="width:30upx;height:30upx;position: absolute;right: -15upx;top: -15upx;" @click="delFirstImg" src="../../static/icon_del.png" mode=""></image>
 					</view>
 					<view class="tips">需上传一张1：1的图片</view>
@@ -63,22 +67,20 @@
 				</view>
 			</view>
 			<button form-type="submit">提交</button>
-			<!-- <button form-type="reset">Reset</button> -->
-			<view style="position: fixed;top:0;left: 0;">
-				<image-cropper crop-fixed="true" crop-width="200" cropHeight="200" :src="tempFilePath" @confirm="confirm" @cancel="cancel"></image-cropper>
-			</view>
 		</form>
+		
+		<!-- <image-cropper crop-fixed="true" crop-width="200" cropHeight="200" :src="tempFirstImg" @confirm="confirm" @cancel="cancel"></image-cropper> -->
 	</view>
 </template>
 
 <script>
-	import avatar from '../../components/yq-avatar/yq-avatar.vue'
-	import ImageCropper from "@/components/invinbg-image-cropper/invinbg-image-cropper.vue"
+	import ImageCropper from "@/components/invinbg-image-cropper/invinbg-image-cropper.vue";
+	import avatar from "../../components/yq-avatar/yq-avatar.vue";
 	
 	export default {
 		components:{
-			avatar,
-			ImageCropper
+			ImageCropper,
+			avatar
 		},
 		data() {
 			return {
@@ -87,6 +89,7 @@
 				typeIndex:0,
 				category:[['1','2'],['1-1','1-2','1-3']],
 				categoryIndex:[0,0],
+				url:'../../static/photo.jpg',
 				tempFirstImg:'',
 				cropFirstImg:'',
 				detailImgs:[]
@@ -115,29 +118,33 @@
 			changeCategory(e){
 				this.categoryIndex = e.detail.value;
 			},
+			myUpload(rsp) {
+			    this.url = rsp.path; //更新头像方式一
+			    //rsp.avatar.imgSrc = rsp.path; //更新头像方式二
+			},
 			chooseFirstImg(){
-				uni.chooseImage({
-					count:1,
-					sizeType:['compressed'],
-					success:res => {
-						console.log(res.tempFilePaths.shift())
-						this.tempFilePath = res.tempFilePaths.shift()
-					}
-				})
+				if(!this.cropFirstImg){
+					uni.chooseImage({
+						count: 1, //默认9
+						sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+						sourceType: ['album'], //从相册选择
+						success:res => {
+							 this.tempFirstImg = res.tempFilePaths.shift()
+						}
+					})
+				}
 			},
-			confirm(e) {
-				console.log(e)
-			    this.tempFilePath = ''
-			    this.cropFilePath = e.detail.tempFilePath
-			},
-			cancel() {
-			    console.log('canceled')
-			},
-			//  myUpload(rsp) {
-			// 	this.cropFirstImg = rsp.path; //更新头像方式一
+			// confirm(e) {
+			// 	console.log(e)
+			//     this.tempFirstImg = ''
+			//     this.cropFirstImg = e.detail.tempFilePath
+			// },
+			// cancel() {
+			//     console.log('canceled')
 			// },
 			delFirstImg(){
-				this.firstImg = ''
+				this.tempFirstImg = ''
+				this.cropFirstImg = ''
 			},
 			chooseDetailImgs(){
 				uni.chooseImage({
@@ -160,9 +167,10 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	.goodAddPage{
 		width: 100vw;
+		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
 		background-color: #eee;
