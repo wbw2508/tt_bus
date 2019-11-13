@@ -12,8 +12,16 @@
 				<view class="num">{{good.remainNum}}</view>
 			</view>
 			<view class="handleBtn">
-				<view class="isPutaway" @click="putaway">上架</view> 
-				<view class="handle" @click="showHandle">操作</view>
+				<block v-if="type=='busNormal' || type=='busSeckill'">
+					<view class="isPutaway" @click="putaway">上架</view>
+					<view class="handle" @click="showHandle">操作</view>
+				</block>
+				<block v-else-if="type=='platformNormal' || type=='platformSeckill'">
+					<view class="isPutaway" @click="shieldGood(good)">屏蔽</view>
+				</block>
+				<block v-else-if="type=='shieldNormal' || type=='shieldSeckill'">
+					<view class="isPutaway" @click="useGood(good)">启用</view>
+				</block>
 			</view>
 		</view>
 	</view>
@@ -25,28 +33,59 @@
 			good:{
 				type:Object,
 				default:{}
+			},
+			type:{
+				type:String,
+				default:'busNormal'
 			}
 		},
 		data() {
 			return {
+				handleList:{
+					'busNormal': ["修改库存","转为秒杀品","编辑"],
+					'busSeckill': ["修改库存","转为普通品","编辑"]
+				}
 			};
+		},
+		created() {
+			console.log(this.type)
 		},
 		methods:{
 			showHandle(){
 				uni.showActionSheet({
-					itemList:["修改库存","转为秒杀品","编辑"],
-					success(res){
+					itemList:this.handleList[this.type],
+					success:res => {
 						console.log('选中了第' + (res.tapIndex + 1) + '个按钮')
+						console.log(this.good)
+						this.$parent.currentGood = this.good
+						if(res.tapIndex == 0){
+							this.$parent.isShowPopup = true
+						}else if(res.tapIndex == 1){
+							
+						}else if(res.tapIndex == 2){
+							// uni.navigateTo({
+							// 	url:'../pages/goodAdd/goodAdd'
+							// })
+						}
 					},
 					fail(res) {
 						console.log(res.errMsg)
 					}
 				})
 			},
+			//上架
 			putaway(){
 				uni.navigateTo({
 					url:'../goodPutaway/goodPutaway'
 				})
+			},
+			// 屏蔽商品
+			shieldGood(good){
+				console.log('屏蔽商品：',good.nm)
+			},
+			//启用商品
+			useGood(){
+				console.log('启用商品：',good.nm)
 			}
 		}
 	}
@@ -100,7 +139,6 @@
 		}
 		.handleBtn{
 			display: flex;
-			justify-content: flex-end;
 			.isPutaway,.noPutaway,.handle{
 				border-radius: 10upx;
 				box-sizing: border-box;

@@ -7,8 +7,8 @@
 			</view>
 		</navigator>
 		<view class="section">
-			<scroll-view class="oneCat" scroll-y="true" >
-				<view v-for="(item,index) in oneCatList" :key="index" class="item" :class="{active:oneCat == item}" @click="changeOneCat(item)">{{item}}</view>
+			<scroll-view class="oneCat" scroll-y="true">
+				<view v-for="(item,index) in oneCatList" :key="index" class="item" :class="{active:oneCat.id == item.id}" @click="changeOneCat(item)">{{item.nm}}</view>
 			</scroll-view>
 			<view class="content">
 				<view v-if="toggleShow" class="secondMask">
@@ -22,32 +22,44 @@
 				</view>
 				<view class="secondCat">
 					<scroll-view class="twoCat" scroll-x="true">
-						<view v-for="(item,index) in twoCatList" :key="index" class="item" :class="{active:twoCat == item}" @click="changeTwoCat(item)">{{item}}</view>
+						<view v-for="(item,index) in twoCatList" :key="index" class="item" :class="{active:twoCat.id == item.id}" @click="changeTwoCat(item)">{{item.nm}}</view>
 					</scroll-view>
 				</view>
 				<scroll-view class="goodsArea" scroll-y="true">
-					<good v-for="(item,index) in goodsList" :key="index" :good="item"></good>
+					<good v-for="(item,index) in goodsList" :key="index" :good="item" :type="type"></good>
 				</scroll-view>
 			</view>
 		</view>
+		<block v-if="isShowPopup">
+			<changePopup :good="currentGood"></changePopup>
+		</block>
 	</view>
 </template>
 
 <script>
 	import good from '../../components/good.vue'
+	import changePopup from '../../components/changePopup.vue'
+	import { request } from '../../utils/wxutil.js'
+	import { mapActions } from 'vuex'
+	const api = require('../../config/api.js')
 	
 	export default {
 		components:{
-			good
+			good,
+			changePopup
 		},
 		data() {
 			return {
+				isShowPopup:false,
 				title:'',
+				type:'busNormal',
 				toggleShow:false,
-				oneCatList:['蔬菜豆制品','新鲜水果','肉禽蛋','水产海鲜','乳品烘培','蔬菜豆制品1','新鲜水果1','肉禽蛋1','水产海鲜1','乳品烘培1'],
-				oneCat:'蔬菜豆制品',
-				twoCatList:['全部','叶菜','根茎菜','花果菜','菌菇菜','调味菜','豆制品'],
-				twoCat:'全部',
+				oneCatList:[],
+				oneCat:'',
+				twoCatList:[{nm:'全部',id:''}],
+				twoCat:'',
+				currentGood:{},
+				pageNum:1,
 				goodsList:[
 					{
 						img:'../static/temp/prod.png',
@@ -116,40 +128,87 @@
 			};
 		},
 		onLoad(e) {
-			console.log(e.type)
+			// console.log(e.type)
 			switch (e.type){
 				case 'busNormal':
 					this.title = '商户普通商品'
+					this.type = 'busNormal'
 					break;
 				case 'busSeckill':
 					this.title = '商户秒杀商品'
+					this.type = 'busSeckill'
 					break;
 				case 'platformNormal':
 					this.title = '平台普通商品'
+					this.type = 'platformNormal'
 					break;
 				case 'platformSeckill':
 					this.title = '平台秒杀商品'
+					this.type = 'platformSeckill'
 					break;
 				case 'shieldNormal':
 					this.title = '屏蔽平台普通商品'
+					this.type = 'shieldNormal'
 					break;
 				case 'shieldSeckill':
 					this.title = '屏蔽平台秒杀商品'
+					this.type = 'shieldSeckill'
 					break;
 				default:
 					this.title = '平台普通商品'
+					this.type = 'busNormal'
 					break;
 			}
 			uni.setNavigationBarTitle({
 				title:this.title
 			})
 		},
+		onShow(){
+			this.isRefresh()
+		},
+		onPullDownRefresh(){
+			this.isRefresh()
+		},
 		methods:{
+			...mapActions(['getOneCat','getTwoCat','nomalPageAllOneOwnOfCom']),
+			isRefresh(){
+				this.getOneCat().then(res=>{
+					if(res){
+						this.oneCatList = res.data.data
+						console.log(this.oneCat)
+						if(this.oneCat == ''){
+							this.oneCat = res.data.data[0]
+						}
+						this.getTwoCat(this.oneCat.id).then(res=>{
+							this.twoCatList = [
+								{nm:'全部',id:''},
+								...res.data.data
+							]
+							this.twoCat = this.twoCatList[0]
+							this.nomalPageAllOneOwnOfCom({
+								categoryId:this.oneCat.id,
+								secondCategoryId:this.twoCat.id,
+								pageNum:this.pageNum
+							}).then(res=>{
+								// console.log(res)
+							})
+						})
+					}
+				})
+			},
+			hidePopup(){
+				this.isShowPopup = false
+			},
+			showPopup(){
+				this.isShowPopup = true
+			},
 			changeOneCat(item){
 				this.oneCat = item
+				this.isRefresh()
 			},
 			changeTwoCat(item){
 				this.twoCat = item
+				this.isRefresh()
 			},
 			toggle(){
 				this.toggleShow = !this.toggleShow
@@ -208,12 +267,13 @@
 						color: red;
 						border-bottom: 2upx solid red;
 						background-color: #fff;
+						box-sizing: border-box;
 					}
 				}
 			}
 			.content{
 				display: flex;
-				flex: 1;
+				width: 550upx;
 				font-size: 26upx;
 				position: relative;
 				flex-direction: column;

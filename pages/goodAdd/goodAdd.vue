@@ -1,6 +1,6 @@
 <template>
 	<view class="goodAddPage">
-		<form class="addForm" @submit="goodAdd" @reset="">
+		<form v-if="isShowForm" class="addForm" @submit="goodAdd" @reset="">
 			<view class="line type">
 				<label for="type">上架类型</label>
 				<picker class="content" mode="selector" :range="type" @change="changeType" :value="typeIndex">
@@ -45,11 +45,7 @@
 				<label for="">首图</label>
 				<view class="content">
 					<view style="position: relative;display: inline-block;">
-						<avatar
-							selWidth="200px" selHeight="400upx" @upload="myUpload" :avatarSrc="url"
-							avatarStyle="width: 200upx; height: 200upx;">
-						</avatar>
-						<!-- <image @click="chooseFirstImg" :src="cropFirstImg =='' ? '../../static/photo.jpg' : cropFirstImg" mode=""></image> -->
+						<image @click="chooseFirstImg" :src="cropFirstImg =='' ? '../../static/photo.jpg' : cropFirstImg" mode=""></image>
 						<image v-if="cropFirstImg" style="width:30upx;height:30upx;position: absolute;right: -15upx;top: -15upx;" @click="delFirstImg" src="../../static/icon_del.png" mode=""></image>
 					</view>
 					<view class="tips">需上传一张1：1的图片</view>
@@ -68,26 +64,25 @@
 			</view>
 			<button form-type="submit">提交</button>
 		</form>
-		
-		<!-- <image-cropper crop-fixed="true" crop-width="200" cropHeight="200" :src="tempFirstImg" @confirm="confirm" @cancel="cancel"></image-cropper> -->
+		<picture-tailor ref="pictureTailor" :pictureSrc="tempFirstImg" @createImg="createImg"></picture-tailor>
 	</view>
 </template>
 
 <script>
-	import ImageCropper from "@/components/invinbg-image-cropper/invinbg-image-cropper.vue";
-	import avatar from "../../components/yq-avatar/yq-avatar.vue";
-	
+	import pictureTailor from "../../components/picture-tailor/pictureTailor.vue";
+	import { mapActions } from "vuex"
 	export default {
 		components:{
-			ImageCropper,
-			avatar
+			pictureTailor
 		},
 		data() {
 			return {
+				isShowForm:true,
 				type:['普通','秒杀'],
 				isSeckill:false,
 				typeIndex:0,
-				category:[['1','2'],['1-1','1-2','1-3']],
+				categoryList:{},
+				category:[[{id:1,name:'第一项'},{id:2,name:'第二项'}],['1-1','1-2','1-3']],
 				categoryIndex:[0,0],
 				url:'../../static/photo.jpg',
 				tempFirstImg:'',
@@ -95,7 +90,33 @@
 				detailImgs:[]
 			};
 		},
+		onLoad(e) {
+			// console.log(e)
+		},
+		onShow() {
+			this.listFirAndSecCatOfCom().then(res=>{
+				// console.log(res.data.data)
+				let tempObj = {},tempList = []
+				for(let i in res.data.data){
+					tempObj[res.data.data[i].nm] = res.data.data[i].goodsSecondCategoryExtLists
+					tempList.push(res.data.data[i].nm)
+				}
+				this.categoryList = tempObj
+				this.category = [
+					tempList,
+					tempObj[tempList[0]].nm
+				]
+				console.log(this.categoryList)
+			})
+		},
 		methods:{
+			...mapActions(['listFirAndSecCatOfCom']),
+			hideForm(){
+				this.isShowForm = false
+			},
+			showForm(){
+				this.isShowForm = true
+			},
 			changeType(e){
 				this.typeIndex = e.detail.value
 				this.isSeckill = false
@@ -106,11 +127,8 @@
 			chooseCategory(e){
 				console.log('修改的列为：' + e.detail.column + '，值为：' + e.detail.value)
 				this.categoryIndex[e.detail.column] = e.detail.value
-				if(e.detail.value==0 && e.detail.column==0){
-					this.category[1] = ['1-1','1-2','1-3']
-					this.categoryIndex.splice(1, 1, 0)
-				}else if(e.detail.value==1 && e.detail.column==0){
-					this.category[1] = ['2-1','2-2']
+				if(e.detail.column == 0){
+					this.category[1] = this.categoryList[e.detail.value]
 					this.categoryIndex.splice(1, 1, 0)
 				}
 				this.$forceUpdate() //强制重新渲染
@@ -118,30 +136,21 @@
 			changeCategory(e){
 				this.categoryIndex = e.detail.value;
 			},
-			myUpload(rsp) {
-			    this.url = rsp.path; //更新头像方式一
-			    //rsp.avatar.imgSrc = rsp.path; //更新头像方式二
-			},
 			chooseFirstImg(){
 				if(!this.cropFirstImg){
 					uni.chooseImage({
 						count: 1, //默认9
 						sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-						sourceType: ['album'], //从相册选择
 						success:res => {
 							 this.tempFirstImg = res.tempFilePaths.shift()
+							 this.$refs.pictureTailor.showTailor();
 						}
 					})
 				}
 			},
-			// confirm(e) {
-			// 	console.log(e)
-			//     this.tempFirstImg = ''
-			//     this.cropFirstImg = e.detail.tempFilePath
-			// },
-			// cancel() {
-			//     console.log('canceled')
-			// },
+			createImg(e) {
+				this.cropFirstImg = e
+			},
 			delFirstImg(){
 				this.tempFirstImg = ''
 				this.cropFirstImg = ''
@@ -163,6 +172,12 @@
 			goodAdd(e){
 				console.log(e)
 			}
+		},
+		onBackPress() {
+			if (this.$refs.pictureTailor.isShow) {
+				this.$refs.pictureTailor.hideTailor();
+			}
+			return true;
 		}
 	}
 </script>

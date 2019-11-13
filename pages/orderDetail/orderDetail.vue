@@ -1,33 +1,37 @@
 <template>
 	<view class="orderDetail">
 		<scroll-view class="headClum" scroll-x="true">
-			<view v-for="(item,index) in tabList" class="tabItem" :key="index" :class="{active:activeId==item.id}" @click="changeTab(item.id)">{{item.text}}</view>
+			<view v-for="(item,index) in tabList" class="tabItem" :key="index" :class="{active:activeId==item.id}" @click="changeTab(item)">{{item.text}}</view>
 		</scroll-view>
-		<view class="searchBox">
+		<!-- <view class="searchBox">
 			<view class="searchInput">
 				<image class="searchIcon" src="../../static/icon_ck.png" mode=""></image>
 				<input type="text" :value="searchVal" @input="changeVal" placeholder="根据会员名查询" />
 				<image v-if="searchVal" class="cancelIcon" @click="clearVal" src="../../static/btn_qx.png" mode=""></image>
 			</view>
 			<view class="searchBtn" @click="search">搜索</view>
-		</view>
+		</view> -->
 		<view class="content">
-			<view class="item" v-for="(item,index) in list" :key="index">
+			 <view class="no-list" v-if="list.length==0">
+			    <image src="../../static/icon_zwbj.png"></image>
+			    <view>暂无订单</view>
+			  </view>
+			<view v-else class="item" v-for="(item,index) in list" :key="index">
 				<view class="top">
 					<view class="left">
-						<image class="user" :src="item.user.url" mode=""></image>
+						<image class="user" :src="item.imgUrl" mode=""></image>
 						<view class="info">
-							<view class="nickName">{{item.user.nickName}}</view>
-							<view class="phone">{{item.user.phone}}</view>
+							<view class="nickName">{{item.userNm}}</view>
+							<view class="phone">{{item.phone || '无'}}</view>
 						</view>
 					</view>
 					<view class="status">{{item.status}}</view>
 				</view>
 				<scroll-view scroll-x="true" class="middle" >
-					<image v-for="(img,index2) in item.goodsImg" :key="index2" class="goodImg" :src="img" mode=""></image>
+					<image v-for="(img,index2) in item.goodsTradeItemExtLists" :key="index2" class="goodImg" :src="img.skuImg" mode=""></image>
 				</scroll-view>
 				<view class="bottom">
-					共：{{item.num}}件商品 实付：￥{{item.money}}
+					共：{{item.goodsTradeItemExtLists.length}}件商品 实付：￥{{item.payment}}
 				</view>
 			</view>
 		</view>
@@ -35,73 +39,63 @@
 </template>
 
 <script>
+	import { mapActions } from 'vuex'
 	export default {
 		data() {
 			return {
 				activeId:0,
 				searchVal:'',
+				pageNum:1,
 				tabList:[
-					{text:'全部',id:0},
-					{text:'待配送',id:1},
-					{text:'待收货',id:2},
-					{text:'待自提',id:3},
-					{text:'已完成',id:4}
+					{text:'全部',id:0,statCd:''},
+					{text:'待配送',id:1,statCd:'80010.110'},
+					{text:'待收货',id:2,statCd:'80010.120'},
+					{text:'待自提',id:3,statCd:'80010.130'},
+					{text:'已完成',id:4,statCd:'80010.140'}
 				],
-				list:[
-					{
-						user:{
-							url:'../../static/temp/tx.png',
-							nickName:'健康美丽快乐的杉杉',
-							phone:18058641287
-						},
-						status:'待配送',
-						goodsImg:[
-							'../../static/temp/prod.png',
-							'../../static/temp/prod.png',
-							'../../static/temp/prod.png',
-							'../../static/temp/prod.png',
-						],
-						num:4,
-						money:46.0
-					},
-					{
-						user:{
-							url:'../../static/temp/tx.png',
-							nickName:'健康美丽快乐的杉杉',
-							phone:18058641287
-						},
-						status:'待配送',
-						goodsImg:[
-							'../../static/temp/prod.png',
-							'../../static/temp/prod.png',
-							'../../static/temp/prod.png',
-							'../../static/temp/prod.png',
-						],
-						num:4,
-						money:46.0
-					},
-					{
-						user:{
-							url:'../../static/temp/tx.png',
-							nickName:'健康美丽快乐的杉杉',
-							phone:18058641287
-						},
-						status:'待配送',
-						goodsImg:[
-							'../../static/temp/prod.png',
-							'../../static/temp/prod.png',
-							'../../static/temp/prod.png',
-							'../../static/temp/prod.png',
-						],
-						num:4,
-						money:46.0
-					}
-				]
+				currentTab:{},
+				list:[]
 			};
 		},
+		onShow(){
+			this.currentTab = this.tabList[0]
+			this.isResfresh()
+		},
 		methods:{
-			changeTab(id){
-				this.activeId = id
+			...mapActions(['getOrder']),
+			isResfresh(){
+				uni.showLoading({
+					title:'加载中...',
+					mask:true
+				})
+				this.list = []
+				this.orderByPage()
+			},
+			//
+			orderByPage(){
+				this.getOrder({
+					statCd:this.currentTab.statCd,
+					pageNum:this.pageNum
+				}).then(res=>{
+					console.log(res)
+					let status = ''
+					if(this.currentTab.statCd){
+						status = this.currentTab.text
+					}
+					for(let i in res.data.data){
+						this.list.push({
+							...res.data.data[i],
+							status:status
+						})
+					}
+					uni.hideLoading()
+				})
+			},
+			changeTab(item){
+				this.pageNum = 1
+				this.activeId = item.id
+				this.currentTab = item
+				this.isResfresh()
 			},
 			changeVal(e){
 				this.searchVal = e.detail.value
@@ -112,6 +106,17 @@
 			search(){
 				console.log(this.activeId,this.searchVal)
 			}
+		},
+		onPullDownRefresh() {
+			this.isResfresh()
+		},
+		onReachBottom(){
+			uni.showLoading({
+				title:'加载中...',
+				mask:true
+			})
+			this.pageNum += 1
+			this.orderByPage()
 		}
 	}
 </script>
@@ -191,6 +196,23 @@
 			display: flex;
 			flex-direction: column;
 			font-size: 28upx;
+			.no-list{
+				height: 400rpx;
+				  display: flex;
+				  flex-direction: column;
+				  align-items: center;
+				  justify-content: center;
+				  color: #999;
+				  background-color: #fff;
+				  view{
+					   margin-top: 20rpx;
+				  }
+				  image{
+					   display: block;
+					    width: 149rpx;
+					    height: 160rpx;
+				  }
+			}
 			.item{
 				background-color: #fff;
 				display: flex;
@@ -208,6 +230,7 @@
 							width: 60upx;
 							height: 60upx;
 							margin-right: 20upx;
+							border-radius: 30upx;
 						}
 						.info{
 							display: flex;

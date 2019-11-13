@@ -13,38 +13,68 @@
 					<image class="icon" :src="item.icon" mode=""></image>
 					<view class="text">{{item.text}}</view>
 				</view>
-				<view v-if="item.right" class="right">{{item.right}}</view>
+				<view v-if="item.right&&busId" class="right">{{busId}}</view>
 			</view>
 		</view>
-		<view class="bottom">退出登录</view>
+		<view class="bottom" @click="logout">退出登录</view>
+		<block v-if="!isLogin">
+			<forLogin></forLogin>
+		</block>
 	</view>
 </template>
 
 <script>
+	import forLogin from '../../components/forLogin.vue'
+	import { mapState,mapActions } from 'vuex'
+	
 	export default {
+		components:{
+			forLogin
+		},
+		computed:{
+			...mapState(['isLogin','busId']),
+		},
 		data() {
 			return {
 				list:[
 					{
 						icon:'../../static/icon_ew.png',
 						text:'我的二维码',
-						right:null,
+						right:false,
 						isShow:false
 					},
 					{
 						icon:'../../static/icon_md.png',
 						text:'我的门店码',
-						right:'1001',
+						right:true,
 						isShow:true
 					},
 					{
 						icon:'../../static/icon_kf.png',
 						text:'联系客服',
-						right:null,
+						right:false,
 						isShow:false
 					}
 				]
 			};
+		},
+		onShow() {
+			if(uni.getStorageSync('x-auth-token')&&uni.getStorageSync('busInfo')){
+				this.$store.state.isLogin = true
+				this.$store.state.busId = uni.getStorageSync('busInfo').busId
+			}else{
+				this.$store.state.isLogin = false
+				uni.showToast({
+					title:'请先登录',
+					icon:'none'
+				})
+			}
+		},
+		methods:{
+			...mapActions(['busLogout','getOneCat']),
+			logout(){
+				this.busLogout()
+			}
 		}
 	}
 </script>

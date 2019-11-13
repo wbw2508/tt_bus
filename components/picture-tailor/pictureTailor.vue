@@ -3,12 +3,14 @@
 		<movable-area class="picture-area">
 			<movable-view class="picture-view" :style="{width:img_width/img_scaling+'px',height:img_height/img_scaling+'px'}"
 			 direction="all" :x="offsetX" :y="offsetY" scale="true" :scale-min="scaleMin" @change="movableChange" @scale="movableScale">
-				<image :style="{width:img_width/img_scaling+'px',height:img_height/img_scaling+'px'}" :src="pictureSrc"></image>
+				<image v-if="pictureSrc" :style="{width:img_width/img_scaling+'px',height:img_height/img_scaling+'px'}" :src="pictureSrc"></image>
 			</movable-view>
 		</movable-area>
 		<view class="select-box"></view>
 		<button class="button-view" @click="createImg">完成</button>
-		<canvas canvas-id="picture-canvas" class="canvas-view"></canvas>
+		<view style="position: fixed;left: -99999px;">
+			<canvas canvas-id="myCanvas" class="canvas-view"></canvas>
+		</view>
 	</view>
 </template>
 
@@ -48,10 +50,12 @@
 			// 显示组件
 			showTailor() {
 				this.isShow = true;
+				this.$parent.isShowForm = false
 			},
 			// 隐藏组件
 			hideTailor() {
 				this.isShow = false;
+				this.$parent.isShowForm = true
 			},
 			// 初始化图片
 			getImgInfo() {
@@ -101,23 +105,21 @@
 			},
 			// 截取图片
 			createImg() {
-				
-				let ctx = uni.createCanvasContext("picture-canvas");
-				ctx.drawImage(this.pictureSrc, newOffsetX, newOffsetY, this.img_width /
-					this.img_scaling * this.scale,
-					this.img_height / this.img_scaling * this.scale);
-				ctx.draw(false, () => {
+				const _this = this
+				let ctx = uni.createCanvasContext("myCanvas",_this);
+				ctx.drawImage(this.pictureSrc, newOffsetX, newOffsetY,this.img_width / this.img_scaling * this.scale,this.img_height / this.img_scaling * this.scale);
+				ctx.draw(false,()=>{
 					uni.canvasToTempFilePath({
 						// 截取图片尺寸
+						canvasId:'myCanvas',
 						destWidth: tailorSize / 2,
 						destHeight: tailorSize / 2,
-						canvasId: "picture-canvas",
 						success: (res) => {
 							console.log(res.tempFilePath)
-							this.hideTailor();
-							this.$emit("createImg", res.tempFilePath)
+							_this.hideTailor();
+							_this.$emit("createImg", res.tempFilePath)
 						}
-					});
+					},_this);
 				});
 			}
 		}

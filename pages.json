@@ -34,7 +34,9 @@
         ,{
             "path" : "pages/orderDetail/orderDetail",
             "style" : {
-				"navigationBarTitleText":"订单明细"
+				"navigationBarTitleText":"订单明细",
+				"enablePullDownRefresh":true,
+				"onReachBottomDistance":50
 			}
         }
         ,{
@@ -45,22 +47,14 @@
             "path" : "pages/goodsList/goodsList",
             "style" : {
 				"navigationBarTitleText":"商品列表",
-				"disableScroll":true
+				"enablePullDownRefresh":true
 			}
-        }
-        ,{
-            "path" : "pages/test2/test2",
-            "style" : {}
         }
         ,{
             "path" : "pages/searchList/searchList",
             "style" : {
 				"navigationBarTitleText":"搜索"
 			}
-        }
-        ,{
-            "path" : "pages/test/test",
-            "style" : {}
         }
         ,{
             "path" : "pages/goodPutaway/goodPutaway",
@@ -70,11 +64,15 @@
             "path" : "pages/test3/test3",
             "style" : {}
         }
+        ,{
+            "path" : "pages/test/test",
+            "style" : {}
+        }
     ],
 	"tabBar": {
 		"color":"#999999",
 		"borderStyle":"black",
-		"backgroundColor":"white",
+		"backgroundColor":"#FFFFFF",
 		"selectedColor":"#FF0000",
 		"list": [
 			{
@@ -102,17 +100,14 @@
 			"name":"新增商品",
 			"path":"pages/goodAdd/goodAdd"
 		},{
-			"name":"图片裁剪1",
-			"path":"pages/test/test"
-		},{
-			"name":"图片裁剪2",
-			"path":"pages/test2/test2"
-		},{
 			"name":"图片裁剪3",
 			"path":"pages/test3/test3"
 		},{
 			"name":"商品列表",
 			"path":"pages/goodsList/goodsList"
+		},{
+			"name":"user",
+			"path":"pages/user/user"
 		}]
 	}
 }
