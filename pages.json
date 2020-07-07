@@ -64,10 +64,6 @@
             "path" : "pages/test3/test3",
             "style" : {}
         }
-        ,{
-            "path" : "pages/test/test",
-            "style" : {}
-        }
     ],
 	"tabBar": {
 		"color":"#999999",
